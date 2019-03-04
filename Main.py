@@ -2,10 +2,12 @@ import json
 import logging
 import re
 import requests
+import os
 
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
 token = "778249680:AAGdQFShvI2jxoWvs4HWq1uTpPkw9uCTIE8"
+# token = os.environ['TELEGRAM_TOKEN']
 
 updater = Updater(token=token)  # Токен API к Telegram
 dispatcher = updater.dispatcher
@@ -39,7 +41,7 @@ def set_link(bot, update):
     global project_id
     link_to_project = str(update.message.text)
     logging.warning(link_to_project)
-    result = re.search('\/project\/(\\d*?)\/', link_to_project)
+    result = re.search('/project/(\\d*?)/', link_to_project)
     logging.warning(result.group(0))
     logging.warning(result.group(1))
     project_id = result.group(1)
@@ -49,6 +51,15 @@ def set_link(bot, update):
 
 def get_stat(bot, update):
     logging.warning("get_stat")
+    project = get_json_project_from_crowd_api()
+    title = project["title"]
+    founded_sum = project["funded_sum"]
+    near_goal = project["near_goal"]["target_sum"]
+    bot.send_message(chat_id=update.message.chat_id,
+                     text='Project: {0}. Current: {1}. Next goal: {2}'.format(title, founded_sum, near_goal))
+
+
+def get_json_project_from_crowd_api():
     global api_link
     headers = {
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.9; rv:45.0) Gecko/20100101 Firefox/45.0'
@@ -56,13 +67,8 @@ def get_stat(bot, update):
     r = requests.get(api_link, headers=headers)
     result = re.match("<textarea>(.*)</textarea>", r.text)
     text = result.group(1)
-    json_string = json.loads(text)
-    project = json_string["Project"]
-    title = project["title"]
-    founded_sum = project["funded_sum"]
-    near_goal = project["near_goal"]["target_sum"]
-    bot.send_message(chat_id=update.message.chat_id,
-                     text='Project: {0}. Current: {1}. Next goal: {2}'.format(title, founded_sum, near_goal))
+    json_resp = json.loads(text)
+    return json_resp["Project"]
 
 
 def error(update, context):
