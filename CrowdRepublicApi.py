@@ -32,4 +32,5 @@ def get_project_via_api_by_id(project_id):
     result = re.match(__crowd_api_pattern, r.text)
     text = result.group(1)  # убираем левые xml-скобки
     json_resp = json.loads(text)
+    logger.warning("SUCCESS")
     return json_resp["Project"]
