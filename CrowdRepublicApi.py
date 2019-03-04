@@ -3,6 +3,8 @@ import re
 
 import requests
 
+from Main import logger
+
 __project_id_pattern = re.compile('/project/(\\d*?)/')
 __crowd_api_pattern = re.compile('<textarea>(.*)</textarea>')
 __headers = {
@@ -18,10 +20,13 @@ def get_id_from_message_with_web_link(message):
     project_id = result.group(1)
     api_link = str(__blueprint_to_api_request_by_project_id).format(project_id)
     __project_id_to_link[project_id] = api_link
+    logger.warning('For projectId {0} stored {1}'.format(project_id, api_link))
 
 
 def get_project_via_api_by_id(project_id):
+    logger.warning('Try get request with projectId: {}'.format(project_id))
     api_link = __project_id_to_link.get(project_id)
+    logger.warning('Link for it: {}'.format(api_link))
     r = requests.get(api_link, headers=__headers)
     result = re.match(__crowd_api_pattern, r.text)
     text = result.group(1)  # убираем левые xml-скобки
