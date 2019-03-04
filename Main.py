@@ -1,5 +1,9 @@
+import json
+import logging
+import re
+import requests
+
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
-import logging, re, requests, json
 
 token = "778249680:AAGdQFShvI2jxoWvs4HWq1uTpPkw9uCTIE8"
 
