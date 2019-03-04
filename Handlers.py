@@ -47,14 +47,19 @@ def set_link(bot, update):
                               'данному чату и вся транслирующаяся информация будет '
                               'исключительно о нем. Но через /set всегда можно '
                               'переставить проект в любой момент.')
+    elif 'https' not in message_from_update:
+        bot.send_message(chat_id=update.message.chat_id,
+                         text='Простите, но ссылка не кажется мне валидной, не могли бы вы проверить? Она должна '
+                              'выглядеть примерно так: '
+                              'https://crowdrepublic.ru/project/1017400/Mutanty-Tochka-otschyota')
     else:
         result = re.search(project_id_pattern, message_from_update)
         api_request_link = str(blueprint_to_api_request_by_project_id).format(result.group(1))
-        project = get_json_project_from_crowd_api(link_cache.get(update.message.chat_id))
+        link_cache[update.message.chat_id] = api_request_link
+        project = get_json_project_from_crowd_api(api_request_link)
         bot.send_message(chat_id=update.message.chat_id,
                          text='Проект: {0}\nТекущая сумма: {1}'.format(project["title"], project["funded_sum"]))
         logger.warning('Set with {0} link -> api link: {1}'.format(message_from_update, api_request_link))
-        link_cache[update.message.chat_id] = api_request_link
 
 
 def get_info(bot, update):
