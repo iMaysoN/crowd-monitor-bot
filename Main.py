@@ -38,6 +38,7 @@ def set_link(bot, update):
     global pattern_link
     global project_id
     link_to_project = update.message.text
+    logging.warning(link_to_project)
     project_id = re.match("/project/(\d*?)/", link_to_project).group(1)
     bot.send_message(chat_id=update.message.chat_id, text='Link setted to {}'.format(link_to_project))
     api_link = pattern_link
