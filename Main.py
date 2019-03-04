@@ -1,5 +1,5 @@
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
-import logging
+import logging, re, requests, json
 
 token = "778249680:AAGdQFShvI2jxoWvs4HWq1uTpPkw9uCTIE8"
 
@@ -11,16 +11,50 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 
 logger = logging.getLogger(__name__)
 
+pattern_link = "https://crowdrepublic.ru/x/project/{}?mode=normal&scenario%5B%5D=finance&scenario%5B%5D=basic"
+api_link = ""
+project_id = ""
 
-# Обработка команд
+
+# Обработка текста
 def text_message(bot, update):
     response = 'Получил Ваше сообщение: ' + update.message.text
     bot.send_message(chat_id=update.message.chat_id, text=response)
 
 
+# Обработка команд
 def start(bot, update):
     logger.warning("start")
     bot.send_message(chat_id=update.message.chat_id, text='Привет, давай пообщаемся?')
+
+
+def set_link(bot, update):
+    logging.warning("set")
+    global api_link
+    global pattern_link
+    global project_id
+    link_to_project = update.message.text
+    project_id = re.match("/project/(\d*?)/", link_to_project).group(1)
+    bot.send_message(chat_id=update.message.chat_id, text='Link setted to {}'.format(link_to_project))
+    api_link = pattern_link
+
+
+def get_stat(bot, update):
+    logging.warning("get_stat")
+    global api_link
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.9; rv:45.0) Gecko/20100101 Firefox/45.0'
+    }
+    r = requests.get(api_link, headers=headers)
+    result = re.match("<textarea>(.*)</textarea>", r.text)
+    text = result.group(1)
+    json_string = json.loads(text)
+    project = json_string["Project"]
+    title = project["title"]
+    founded_sum = project["funded_sum"]
+    near_goal = project["near_goal"]["target_sum"]
+    bot.send_message(chat_id=update.message.chat_id,
+                     text='Project: {0}. Current: {1}. Next goal: {2}'.format(title, founded_sum, near_goal))
 
 
 def error(update, context):
@@ -32,11 +66,11 @@ def main():
     logger.warning("main")
 
     # Хендлеры
-    start_command_handler = CommandHandler('start', start)
-    text_message_handler = MessageHandler(Filters.text, text_message)
     # Добавляем хендлеры в диспетчер
-    dispatcher.add_handler(start_command_handler)
-    dispatcher.add_handler(text_message_handler)
+    dispatcher.add_handler(CommandHandler('start', start))
+    dispatcher.add_handler(MessageHandler(Filters.text, text_message))
+    dispatcher.add_handler(CommandHandler('set', set_link))
+    dispatcher.add_handler(CommandHandler('get_stat', get_stat))
     # Начинаем поиск обновлений
     updater.start_polling(clean=True)
     # Останавливаем бота, если были нажаты Ctrl + C
