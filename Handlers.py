@@ -14,7 +14,8 @@ blueprint_to_api_request_by_project_id = "https://crowdrepublic.ru/x/project/{}?
 
 link_cache = dict()
 
-help_message = "Добрый день. Я - вумный бот-красопендра!\nЧтобы установить ссылку на проект - используйте /set.\n" \
+help_message = "Добрый день. Я - вумный бот-красопендра!\n" \
+               "Чтобы установить ссылку на проект - используйте /set <ссылка>.\n" \
                "Для получения информации по установленному - /get_info\n" \
                "Для помощи по каждой команде используйте help после команды (например: /set help)"
 
@@ -38,10 +39,10 @@ def start(bot, update):
 
 def set_link(bot, update):
     message_from_update = update.message.text
-    logger.warning("/set {}".format(message_from_update))
+    logger.warning("Получено {0}".format(message_from_update))
     if 'help' in message_from_update or not message_from_update:
         bot.send_message(chat_id=update.message.chat_id,
-                         text='Команда /set <link> предназначена для установки ссылки '
+                         text='Команда /set <ссылка> предназначена для установки ссылки '
                               'на проект на https://crowdrepublic.ru/ для '
                               'мониторинга. После установки проект привязывается к '
                               'данному чату и вся транслирующаяся информация будет '
@@ -58,13 +59,13 @@ def set_link(bot, update):
         link_cache[update.message.chat_id] = api_request_link
         project = get_json_project_from_crowd_api(api_request_link)
         bot.send_message(chat_id=update.message.chat_id,
-                         text='Проект: {0}\nТекущая сумма: {1}'.format(project["title"], project["funded_sum"]))
+                         text='Установлен проект: {0}\nТекущая сумма: {1}'.format(project["title"], project["funded_sum"]))
         logger.warning('Set with {0} link -> api link: {1}'.format(message_from_update, api_request_link))
 
 
 def get_info(bot, update):
     message_from_update = update.message.text
-    logger.warning("/get_info with {}".format(message_from_update))
+    logger.warning("Получено {0}".format(message_from_update))
     if 'help' in message_from_update:
         project_hint = ''
         if update.message.chat_id in link_cache:
@@ -73,7 +74,7 @@ def get_info(bot, update):
                     link_cache.get(update.message.chat_id))
         bot.send_message(chat_id=update.message.chat_id,
                          text='Команда /get_info для выведения текущий основной статистики проекта, сначала нужно '
-                              'установить проект для слежения через /set <link>, а потом можно использовать эту '
+                              'установить проект для слежения через /set <ссылка>, а потом можно использовать эту '
                               'команду для получения статистики по ручному запросу.{}'.format(project_hint))
     elif update.message.chat_id not in link_cache:
         bot.send_message(chat_id=update.message.chat_id,
