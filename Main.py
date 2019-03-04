@@ -6,7 +6,7 @@ token = "778249680:AAGdQFShvI2jxoWvs4HWq1uTpPkw9uCTIE8"
 
 def start(update, context):
     logger.warning("start")
-    update.bot.reply_text(text="I'm a bot, please talk to me!")
+    update.message.reply_text(text="I'm a bot, please talk to me!")
 
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
