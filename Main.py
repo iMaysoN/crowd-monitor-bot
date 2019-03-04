@@ -14,8 +14,8 @@ logger = logging.getLogger(__name__)
 def main():
     logger.warning("launch")
 
-    updater = Updater(token=os.environ['TELEGRAM_TOKEN'])  # Токен API к Telegram
-    dispatcher = updater.dispatcher
+    bot = Updater(token=os.environ['TELEGRAM_TOKEN'])  # Токен API к Telegram
+    dispatcher = bot.dispatcher
 
     # Добавляем хендлеры в диспетчер
     dispatcher.add_handler(CommandHandler('start', start))
@@ -24,9 +24,9 @@ def main():
     dispatcher.add_handler(CommandHandler('get_info', get_info))
     dispatcher.add_handler(CommandHandler('help', help))
     # Начинаем поиск обновлений
-    updater.start_polling(clean=True)
+    bot.start_polling(clean=True)
     # Останавливаем бота, если были нажаты Ctrl + C
-    updater.idle()
+    bot.idle()
 
 
 if __name__ == '__main__':
