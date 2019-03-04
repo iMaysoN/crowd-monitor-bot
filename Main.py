@@ -6,8 +6,7 @@ import os
 
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
-token = "778249680:AAGdQFShvI2jxoWvs4HWq1uTpPkw9uCTIE8"
-# token = os.environ['TELEGRAM_TOKEN']
+token = os.environ['TELEGRAM_TOKEN']
 
 updater = Updater(token=token)  # Токен API к Telegram
 dispatcher = updater.dispatcher
