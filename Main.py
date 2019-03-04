@@ -39,7 +39,7 @@ def set_link(bot, update):
     global project_id
     link_to_project = str(update.message.text)
     logging.warning(link_to_project)
-    result = re.match('/project/(\\d*?)/', link_to_project)
+    result = re.search('\/project\/(\\d*?)\/', link_to_project)
     logging.warning(result.group(0))
     logging.warning(result.group(1))
     project_id = result.group(1)
