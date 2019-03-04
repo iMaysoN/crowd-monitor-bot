@@ -21,6 +21,7 @@ def get_id_from_message_with_web_link(message):
     api_link = str(__blueprint_to_api_request_by_project_id).format(project_id)
     __project_id_to_link[project_id] = api_link
     logger.warning('For projectId {0} stored {1}'.format(project_id, api_link))
+    return project_id
 
 
 def get_project_via_api_by_id(project_id):
