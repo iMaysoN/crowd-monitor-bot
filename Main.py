@@ -21,7 +21,7 @@ def main():
     dispatcher.add_handler(CommandHandler('start', start))
     dispatcher.add_handler(MessageHandler(Filters.text, text_message))
     dispatcher.add_handler(CommandHandler('set', set_link))
-    dispatcher.add_handler(CommandHandler('get_stat', get_info))
+    dispatcher.add_handler(CommandHandler('get_info', get_info))
     dispatcher.add_handler(CommandHandler('help', help))
     # Начинаем поиск обновлений
     updater.start_polling(clean=True)

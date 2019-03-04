@@ -14,9 +14,9 @@ blueprint_to_api_request_by_project_id = "https://crowdrepublic.ru/x/project/{}?
 
 link_cache = dict()
 
-help_message = "Добрый день. Я - вумный бот-красопендра!\nЧтобы установить ссылку на проект - используйте /set.\nДля " \
-               "получения информации по установленному - /get\n Для помощи по каждой команде используйте help после " \
-               "команды (например: /set help)"
+help_message = "Добрый день. Я - вумный бот-красопендра!\nЧтобы установить ссылку на проект - используйте /set.\n" \
+               "Для получения информации по установленному - /get_info\n" \
+               "Для помощи по каждой команде используйте help после команды (например: /set help)"
 
 
 # Обработка текста
@@ -39,7 +39,7 @@ def start(bot, update):
 def set_link(bot, update):
     message_from_update = update.message.text
     logger.warning("/set {}".format(message_from_update))
-    if 'help' in message_from_update:
+    if 'help' in message_from_update or not message_from_update:
         bot.send_message(chat_id=update.message.chat_id,
                          text='Команда /set <link> предназначена для установки ссылки '
                               'на проект на https://crowdrepublic.ru/ для '
@@ -59,7 +59,7 @@ def set_link(bot, update):
 
 def get_info(bot, update):
     message_from_update = update.message.text
-    logger.warning("/get with {}".format(message_from_update))
+    logger.warning("/get_info with {}".format(message_from_update))
     if 'help' in message_from_update:
         project_hint = ''
         if update.message.chat_id in link_cache:
@@ -70,16 +70,21 @@ def get_info(bot, update):
                          text='Команда /get_info для выведения текущий основной статистики проекта, сначала нужно '
                               'установить проект для слежения через /set <link>, а потом можно использовать эту '
                               'команду для получения статистики по ручному запросу.{}'.format(project_hint))
+    elif update.message.chat_id not in link_cache:
+        bot.send_message(chat_id=update.message.chat_id,
+                         text='Пожалуйста задайте предварительно проект, который хотите отслеживать')
     else:
         project = get_json_project_from_crowd_api(link_cache.get(update.message.chat_id))
         title = project["title"]
         founded_sum = project["funded_sum"]
         near_goal = project["near_goal"]["target_sum"]
         bot.send_message(chat_id=update.message.chat_id,
-                     text='Проект: {0}\nТекущая сумма: {1}\nБлижайшая цель: {2}'.format(title, founded_sum, near_goal))
+                         text='Проект: {0}\nТекущая сумма: {1}\nБлижайшая цель: {2}'.format(title, founded_sum,
+                                                                                            near_goal))
 
 
 # Ловим ошибки и репортим
+# Позволяет не умирать приложению, если вдруг словилась ошибка
 def error(update, context):
     logger.error('Update "%s" caused error "%s"', update, context.error)
 
