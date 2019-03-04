@@ -5,6 +5,7 @@ token = "778249680:AAGdQFShvI2jxoWvs4HWq1uTpPkw9uCTIE8"
 
 
 def start(update, context):
+    logger.warning("start")
     context.bot.send_message(chat_id=update.message.chat_id, text="I'm a bot, please talk to me!")
 
 
@@ -20,6 +21,7 @@ def error(update, context):
 
 
 def main():
+    logger.warning("main")
     updater = Updater(token=token)
     dispatcher = updater.dispatcher
     dispatcher.add_handler(CommandHandler('start', start))
@@ -31,4 +33,5 @@ def main():
 
 
 if __name__ == '__main__':
+    logger.warning("init")
     main()
